@@ -12,10 +12,10 @@ export interface Product {
   images: string[]
 }
 
-// export interface ApiParams {
-//   limit?: number
-//   skip?: number
-//   search?: string
-//   category?: string
-//   select?: string[]
-// }
+export interface ApiParams {
+  limit?: number
+  skip?: number
+  search?: string
+  category?: string
+  select?: string[]
+}
