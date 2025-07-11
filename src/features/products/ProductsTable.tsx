@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, type ReactEventHandler, type ReactHTMLElement } from "react";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../app/hook";
 import { fetchProducts, resetParams, setParams } from "./productsSlice";
@@ -37,6 +37,19 @@ const ProductsTable = () => {
   const [columnFilters, setColumnFilter] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [categories, setCategories] = useState<string[]>([]); // Initialisé avec tableau vide
+  const [searchInput, setSearchInput] = useState(""); // Nouvel état pour la valeur temporaire de recherche
+
+  // Fonction pour gérer le délai de recherche
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchInput(value); // Mettre à jour la valeur affichée dans l'input
+    
+    // Annuler le timeout précédent s'il existe
+    const timeoutId = setTimeout(() => {
+      setGlobalFilter(value); // Mettre à jour le filtre global après 500ms
+    }, 5000);
+    
+    return () => clearTimeout(timeoutId); // Nettoyage du timeout
+  }, []);
 
   // Colonnes de la table
   const columns = useMemo<ColumnDef<Product>[]>(
@@ -192,8 +205,8 @@ const ProductsTable = () => {
             type="text"
             placeholder="Rechercher un produit..."
             className="pl-10 pr-4 py-2 border rounded-md w-full"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
+            value={searchInput}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
 
@@ -236,6 +249,7 @@ const ProductsTable = () => {
           className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 flex items-center gap-2"
           onClick={() => {
             setGlobalFilter("");
+            setSearchInput("");
             setColumnFilter([]);
             dispatch(resetParams());
           }}
